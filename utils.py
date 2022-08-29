@@ -24,6 +24,13 @@ class DuplicationCheck:
       column will be renamed
     - Are there two columns that have the same data (with different column names)
       The second column with same data will be removed
+    - Duplicated rows based on all the columns are removed
+    - if single_cols_check is specified, duplications are checked for rows for each column
+      specified in single_cols_check individually. If there are duplicated, they will be removed
+    - if multi_cols_dup_check is specified, duplications are checked for rows for the columns group
+      specified in multi_cols_dup_check. If there are duplicated, they will be removed
+      
+    
     """
     
     def __init__(
@@ -32,6 +39,15 @@ class DuplicationCheck:
         single_cols_check: Optional[List[str]] = None,
         multi_cols_dup_check: Optional[List[str]] = None,
     ) -> None:
+        
+        """
+        params
+        ------
+        df : input dataframe
+        single_cols_check : Check duplication based on each column individually
+        multi_cols_dup_check : Check duplication based on the column group not individually but together
+        
+        """
     
         self.df = df
         self.single_cols_check = single_cols_check
@@ -73,6 +89,10 @@ class DuplicationCheck:
 
     def check_column_name_duplication(self) -> None:
         
+        """
+        Check if duplicated column names are present in the dataset
+        """
+        
         self.df_dedup = self.df.copy()
         
         # This is done to avoid the original input dataframe to remain unchaged when
@@ -107,6 +127,11 @@ class DuplicationCheck:
         logging.info(f'duplicated columns removed : {dup_names_dup_vals},duplicated column names but different values, These were not removed, need to check manually: {dup_names_diff_vals}')
 
     def check_same_data_duplication(self) -> None:
+        
+        """
+        Check if duplicated data is present in the dataset with
+        different column names
+        """
         
         if self.df_dedup is not None: 
             
@@ -146,6 +171,10 @@ class DuplicationCheck:
             
     def get_dedup_df(self) -> pd.DataFrame:
         
+        """
+        Get the deduped dataset
+        """
+        
         if self.df_dedup_row is not None:
             return self.df_dedup_row
         
@@ -156,6 +185,10 @@ class DuplicationCheck:
             
     def get_duplicated_data_col_names(self) -> List:
         
+        """
+        Get the duplicated column names
+        """
+        
         if self.same_data_cols is not None:      
             return  self.same_data_cols
         else:
@@ -163,6 +196,10 @@ class DuplicationCheck:
             
             
     def check_row_duplication(self) -> None:
+        
+        """
+        Check duplicates for rows
+        """
         
         if self.df_dedup is not None:           
             # on all columns
