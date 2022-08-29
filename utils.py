@@ -14,6 +14,18 @@ logging.basicConfig(
 
 class DuplicationCheck:
     
+    """
+    This class can be used to check duplication in a dataframe. Duplication can be checked
+    based on below aspects
+    
+    - Are there duplicated column names- ex: two columns have the same column name
+      This function checks if the values are the same in both columns and if the values are the
+      same, one column will be removed. If the two columns have different values, then the the second 
+      column will be renamed
+    - Are there two columns that have the same data (with different column names)
+      The second column with same data will be removed
+    """
+    
     def __init__(
         self,
         df: pd.DataFrame,
@@ -28,6 +40,7 @@ class DuplicationCheck:
         self.dup_cols_list = None
         self.df_dedup = None
         self.same_data_cols = None
+        self.df_dedup_row = None
     
 
     @staticmethod
@@ -58,7 +71,7 @@ class DuplicationCheck:
         return indexes
     
 
-    def check_column_name_duplication(self):
+    def check_column_name_duplication(self) -> None:
         
         self.df_dedup = self.df.copy()
         
@@ -93,7 +106,7 @@ class DuplicationCheck:
 
         logging.info(f'duplicated columns removed : {dup_names_dup_vals},duplicated column names but different values, These were not removed, need to check manually: {dup_names_diff_vals}')
 
-    def check_same_data_duplication(self):
+    def check_same_data_duplication(self) -> None:
         
         if self.df_dedup is not None: 
             
@@ -111,17 +124,19 @@ class DuplicationCheck:
                                 self.same_data_cols.append(i+' '+j) 
         
             for i in self.same_data_cols:
+                
                 remove_col_name = i.split(' ')[1] #remove the second column with same data
-                self.df_dedup = self.df_dedup.drop(columns=[remove_col_name])
+                try:
+                    self.df_dedup = self.df_dedup.drop(columns=[remove_col_name])
+                except KeyError:
+                    pass
                 logging.info(f"column {remove_col_name} removed becasue it has same data as { i.split(' ')[0]}")
-
-                return self.df_dedup
         
         else:
             raise AttributeError("Need to run 'check_column_name_duplication' function first")
                
         
-    def get_duplicated_col_name(self):
+    def get_duplicated_col_name(self) -> List:
         
         if self.dup_cols_list is not None:      
             return  self.dup_cols_list
@@ -129,14 +144,17 @@ class DuplicationCheck:
             raise AttributeError("Need to run 'check_column_name_duplication' function first")
 
             
-    def get_dedup_df(self):
+    def get_dedup_df(self) -> pd.DataFrame:
         
-        if self.df_dedup is not None:    
+        if self.df_dedup_row is not None:
+            return self.df_dedup_row
+        
+        elif self.df_dedup is not None:    
             return  self.df_dedup
         else:
             raise AttributeError("Need to run 'check_column_name_duplication' function first")
             
-    def get_duplicated_data_col_names(self):
+    def get_duplicated_data_col_names(self) -> List:
         
         if self.same_data_cols is not None:      
             return  self.same_data_cols
@@ -144,7 +162,7 @@ class DuplicationCheck:
             raise AttributeError("Need to run 'check_same_data_duplication' function first")
             
             
-    def check_row_duplication(self):
+    def check_row_duplication(self) -> None:
         
         if self.df_dedup is not None:           
             # on all columns
@@ -183,8 +201,6 @@ class DuplicationCheck:
                     logging.info(f"{all_n_rows-all_n_rows_deduped} rows removed due to row duplication based specified column group")
                 else:
                      logging.info("No row duplication based on specified column group") 
-                    
-            return self.df_dedup_row
-                
+                                  
         else:
             raise AttributeError("Need to run 'check_column_name_duplication' function first")
