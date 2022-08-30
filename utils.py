@@ -71,7 +71,7 @@ class DuplicationCheck:
         
         for x in self.dup_cols_list:
           
-            duped_cols_indexes = DuplicationCheck.get_dup_col_indexes(self.df_dedup,x)
+            duped_cols_indexes = self.get_dup_col_indexes(self.df_dedup,x)
             
             for i,j in enumerate(duped_cols_indexes[1:]):
                 self.df_dedup.columns.values[j] = x+'_dup_'+str(i)
