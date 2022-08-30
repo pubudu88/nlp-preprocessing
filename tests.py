@@ -48,7 +48,7 @@ def test_input_df_changed():
     dup.check_same_data_duplication()
     dup.check_row_duplication()
     
-    assert df_input.equals(create_ex_dataframe()) == True,"Original dataframe is changed"
+    assert df_input.equals(create_ex_dataframe_1()) == True,"Original dataframe is changed"
     
     
 def test_same_col_name_removed():
